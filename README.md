@@ -2,7 +2,7 @@
 
 Kaggle S&P 500 excess returns forecasting 대회를 위해 만든 금융 시계열 feature denoising 파이프라인입니다.
 
-**Competition Result:** 574 / 3,677 teams, top 15.6% (approximately top 16%).
+**대회 성과:** 3,677팀 중 574위, 상위 15.6% (약 상위 16%).
 
 대회 목표는 S&P 500의 일별 초과수익을 예측하고, 매 거래일 종가 기준으로 S&P 500 보유 비중을 `0`에서 `2` 사이로 결정하는 것입니다. 평가 지표는 시장 대비 초과 성과를 보면서도 120% volatility constraint를 넘는 전략을 강하게 penalize합니다.
 
