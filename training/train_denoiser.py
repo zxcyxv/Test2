@@ -351,7 +351,7 @@ def main():
     parser.add_argument("--cluster_id", type=int, default=None, help="Cluster ID to train (0-6). If not specified, trains all clusters.")
     parser.add_argument("--data_path", type=str, default="train_only.csv", help="Path to training data CSV")
     parser.add_argument("--val_path", type=str, default=None, help="Path to validation data CSV (for IC monitoring)")
-    parser.add_argument("--cluster_config", type=str, default="clustering_results/cluster_assignments.json", help="Path to cluster config JSON")
+    parser.add_argument("--cluster_config", type=str, default="artifacts/clustering_results/cluster_assignments.json", help="Path to cluster config JSON")
     parser.add_argument("--output_dir", type=str, default="trained_models", help="Directory to save trained models")
     parser.add_argument("--window_size", type=int, default=60)
     parser.add_argument("--d_model", type=int, default=128)

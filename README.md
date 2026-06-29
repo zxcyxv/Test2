@@ -1,124 +1,183 @@
 # Financial Denoising
 
-Diffusion-based denoising framework for financial time series data using Mamba state-space models.
+금융 시계열 feature를 diffusion 기반 denoising으로 정제하는 연구용 파이프라인입니다.
 
-## Overview
+이 프로젝트는 feature clustering, Mamba 기반 denoiser 학습, causal denoising, denoising 결과 검증까지 하나의 실험 흐름으로 묶습니다. 핵심 목표는 noisy financial feature를 더 안정적인 신호로 변환하고, 변환된 데이터가 downstream trading signal에 도움이 되는지 검증하는 것입니다.
 
-This module provides a complete pipeline for denoising financial time series features:
-- **Cluster-based denoising**: Groups features by characteristics (mean-reverting, trending, random walk)
-- **Diffusion models**: VP-SDE (Variance Preserving SDE) with Mamba architecture
-- **Causal inference**: Leak-free denoising for production deployment
+## 핵심 기능
 
-## Directory Structure
+- 통계적 특성에 따라 feature를 cluster로 묶습니다.
+- cluster별 Causal Mamba denoiser를 학습합니다.
+- VP-SDE 기반 diffusion denoising을 적용합니다.
+- production 환경을 고려한 causal denoising 경로를 제공합니다.
+- non-causal denoising과 시각화 도구를 실험용으로 제공합니다.
+- 원본 데이터와 denoised 데이터를 비교하는 검증 스크립트를 포함합니다.
+- Kaggle GPU 환경에서 전체 cluster 학습을 실행하는 보조 스크립트를 제공합니다.
 
-```
+## 프로젝트 구조
+
+```text
 FinancialDenoising/
+├── data/
+│   └── train.csv                         # 예제 학습 데이터
+├── artifacts/
+│   └── clustering_results/               # feature clustering 결과
 ├── models/
-│   ├── diffusion_mamba/      # VP-SDE diffusion models with Mamba
-│   └── clustering/            # Feature clustering algorithms
+│   ├── clustering/                       # feature 분석 및 clustering
+│   └── diffusion_mamba/                  # Mamba denoiser, VP-SDE, guidance losses
 ├── training/
-│   ├── train_denoiser.py      # Train cluster-specific denoisers
-│   └── cluster_features.py    # Feature clustering pipeline
+│   ├── cluster_features.py               # feature clustering 실행
+│   └── train_denoiser.py                 # cluster별 denoiser 학습
 ├── inference/
-│   ├── denoise_causal.py      # Causal denoising (stride=1, no leakage)
-│   ├── denoise_dataset.py     # Non-causal denoising (stride=60)
-│   └── visualize_denoising.py # Visualization tools
-├── analysis/
-│   └── analyze_denoised_data.py
+│   ├── denoise_causal.py                 # leak-free causal denoising
+│   ├── denoise_dataset.py                # 실험용 batch/non-causal denoising
+│   └── visualize_denoising.py            # denoising 결과 시각화
 ├── evaluation/
-│   └── validate_denoising.py
-├── clustering_results/        # Saved cluster configurations
-├── trained_models/            # Saved model checkpoints
-└── utils/                     # Shared utilities
+│   └── validate_denoising.py             # denoising 품질 검증
+├── common/
+│   └── evaluation/                       # trading signal 검증 공통 도구
+├── analysis/
+│   └── analyze_denoised_data.py          # denoised 데이터 분석
+├── scripts/
+│   ├── kaggle_train_all_clusters.py      # Kaggle 전체 학습 스크립트
+│   └── calculate_target_loss.py          # target loss 산출 보조 스크립트
+└── utils/                                # 데이터 분할 및 유틸리티
 ```
 
-## Quick Start
+## 전체 흐름
 
-### 1. Feature Clustering
+1. `data/train.csv`에서 feature와 target을 로드합니다.
+2. `training/cluster_features.py`로 feature 통계량을 분석하고 cluster를 만듭니다.
+3. `training/train_denoiser.py`로 cluster별 denoiser를 학습합니다.
+4. `inference/denoise_causal.py`로 각 row를 과거 window만 사용해 denoise합니다.
+5. `evaluation/validate_denoising.py` 또는 `common/evaluation/validate_trading_signals.py`로 원본 대비 성능 변화를 검증합니다.
+
+## 설치
+
+Python 3.10 이상을 권장합니다.
 
 ```bash
-python FinancialDenoising/training/cluster_features.py \
-    --data_path TinyRecursiveModels/CSVs/train_only.csv \
-    --output_dir FinancialDenoising/clustering_results \
-    --n_clusters 7
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
 ```
 
-### 2. Train Denoisers
+`uv`를 사용하는 경우:
 
 ```bash
-# Train for each cluster (0-6)
-for i in {0..6}; do
-    python FinancialDenoising/training/train_denoiser.py \
-        --cluster_id $i \
-        --data_path TinyRecursiveModels/CSVs/train_only.csv \
-        --epochs 100 \
-        --device cuda
-done
+uv sync
 ```
 
-### 3. Causal Denoising (Production)
+GPU 학습을 하려면 환경에 맞는 PyTorch CUDA 빌드가 설치되어 있어야 합니다.
+
+## 빠른 실행
+
+### 1. Feature clustering
 
 ```bash
-python FinancialDenoising/inference/denoise_causal.py \
-    --input_csv TinyRecursiveModels/CSVs/train_only.csv \
-    --output_csv train_denoised_causal.csv \
-    --device cuda
+python training/cluster_features.py \
+  --data_path data/train.csv \
+  --output_dir artifacts/clustering_results \
+  --n_clusters 5
 ```
 
-**Key**: Uses stride=1 with only past 60 rows → no future leakage
-
-### 4. Non-Causal Denoising (Evaluation)
+### 2. Cluster별 denoiser 학습
 
 ```bash
-python FinancialDenoising/inference/denoise_dataset.py \
-    --input_csv TinyRecursiveModels/CSVs/train_only.csv \
-    --output_csv train_denoised.csv \
-    --stride 60 \
-    --device cuda
+python training/train_denoiser.py \
+  --cluster_id 0 \
+  --data_path data/train.csv \
+  --cluster_config artifacts/clustering_results/cluster_assignments.json \
+  --output_dir trained_models \
+  --epochs 100 \
+  --device cuda
 ```
 
-**Note**: Uses stride=60 with full window → faster but not for production
-
-## Model Architecture
-
-- **Base**: Bidirectional Mamba state-space model
-- **Diffusion**: VP-SDE with linear β schedule (β_min=0.0001, β_max=0.02)
-- **Guidance**: Cluster-specific losses (TV loss for mean-reverting, Fourier loss for trending)
-- **Training**: Noise prediction with geometric mean guidance
-
-## Validation
-
-Use `Common/evaluation/validate_trading_signals.py` to compare original vs denoised data:
+여러 cluster를 한 번에 학습하려면:
 
 ```bash
-python Common/evaluation/validate_trading_signals.py \
-    --train_original TinyRecursiveModels/CSVs/train_only.csv \
-    --train_denoised train_denoised_causal.csv \
-    --val_original TinyRecursiveModels/CSVs/val_only.csv \
-    --val_denoised val_denoised_causal.csv
+python scripts/kaggle_train_all_clusters.py
 ```
 
-## Key Files
+### 3. Causal denoising
 
-- `models/diffusion_mamba/vp_sde.py`: VP-SDE implementation
-- `models/diffusion_mamba/denoiser.py`: Mamba denoiser architecture
-- `models/diffusion_mamba/losses.py`: Guidance losses (TV, Fourier)
-- `inference/denoise_causal.py`: **Production-ready causal denoising**
-
-## Dependencies
-
-- PyTorch
-- NumPy, Pandas
-- scikit-learn (clustering)
-- tqdm
-
-## Citation
-
-If you use this denoising framework, please cite:
+```bash
+python inference/denoise_causal.py \
+  --input_csv data/train.csv \
+  --output_csv artifacts/denoised/train_denoised_causal.csv \
+  --cluster_config artifacts/clustering_results/cluster_assignments.json \
+  --models_dir trained_models \
+  --device cuda
 ```
-@misc{financialdenoising2025,
-  title={Diffusion-based Financial Time Series Denoising with Mamba},
-  author={Your Name},
-  year={2025}
+
+causal denoising은 row `t`를 denoise할 때 `[t-59, t]` 구간만 사용합니다. 미래 데이터를 보지 않기 때문에 production 검증에 더 적합합니다.
+
+### 4. 실험용 non-causal denoising
+
+```bash
+python inference/denoise_dataset.py \
+  --input_csv data/train.csv \
+  --output_csv artifacts/denoised/train_denoised.csv \
+  --cluster_config artifacts/clustering_results/cluster_assignments.json \
+  --models_dir trained_models \
+  --stride 60 \
+  --device cuda
+```
+
+이 경로는 빠른 실험용입니다. window 전체를 덮어쓰는 방식이라 production 평가에는 causal denoising을 우선 사용합니다.
+
+## 검증
+
+소스 컴파일:
+
+```bash
+python -m compileall models training inference evaluation common analysis utils scripts
+```
+
+원본 데이터와 denoised 데이터 비교:
+
+```bash
+python common/evaluation/validate_trading_signals.py \
+  --train_original data/train.csv \
+  --train_denoised artifacts/denoised/train_denoised_causal.csv \
+  --val_original artifacts/splits/val_only.csv \
+  --val_denoised artifacts/denoised/val_denoised_causal.csv
+```
+
+## 모델 구성
+
+- `CausalMambaDenoiser`: causal sequence denoising을 위한 Mamba 기반 모델
+- `VPSDE`: variance-preserving SDE diffusion process
+- `DenoisingLoss`: noise prediction 중심 학습 objective
+- `guidance.py`, `losses.py`: TV/Fourier 기반 guidance loss
+- `iterative_denoiser.py`: inference 단계 iterative denoising 루프
+
+## 데이터와 산출물 관리
+
+저장소에는 구조 확인과 재현을 위한 `data/train.csv`와 `artifacts/clustering_results/`가 포함되어 있습니다.
+
+다음 파일은 생성물로 보고 Git에서 제외합니다.
+
+- `trained_models/`
+- `artifacts/denoised/`
+- `artifacts/splits/`
+- `artifacts/visualizations/`
+- `artifacts/evaluation_results/`
+- 로그 파일과 체크포인트 파일
+
+## 참고 문헌
+
+```bibtex
+@article{wang2024financial,
+  title={A Financial Time Series Denoiser Based on Diffusion Model},
+  author={Wang, Zhuohan and Ventre, Carmine},
+  journal={arXiv preprint arXiv:2409.02138},
+  year={2024}
 }
 ```
+
+Paper: https://arxiv.org/pdf/2409.02138
+
+## 현재 상태
+
+이 저장소는 연구/실험용 프로토타입입니다. 모델 학습과 denoising 경로는 포함되어 있지만, 데이터셋별 feature schema와 검증 기준은 실험 목적에 맞게 조정해야 합니다. 실제 투자 또는 production pipeline에 사용하기 전에는 leakage 검증, out-of-sample 검증, transaction cost 반영, 실험 추적 체계를 별도로 갖추는 것이 필요합니다.

@@ -36,14 +36,14 @@ Statistically-driven diffusion denoising system for heterogeneous financial feat
 
 ### 3. Run Feature Clustering
 ```bash
-!python TinyRecursiveModels/train/cluster_features.py \
-    --data_path TinyRecursiveModels/train.csv \
+!python training/cluster_features.py \
+    --data_path data/train.csv \
     --visualize
 ```
 
 ### 4. Train Denoiser for Cluster 0
 ```bash
-!python TinyRecursiveModels/train/train_group_denoiser.py \
+!python training/train_denoiser.py \
     --cluster_id 0 \
     --epochs 50 \
     --batch_size 64 \
@@ -55,7 +55,7 @@ Statistically-driven diffusion denoising system for heterogeneous financial feat
 import os
 
 for cluster_id in range(7):
-    cmd = f"python TinyRecursiveModels/train/train_group_denoiser.py \
+    cmd = f"python training/train_denoiser.py \
         --cluster_id {cluster_id} \
         --epochs 50 \
         --batch_size 64 \

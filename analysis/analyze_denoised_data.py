@@ -518,7 +518,7 @@ def main():
     parser = argparse.ArgumentParser(description="Analyze Denoised Data Characteristics")
     parser.add_argument("--original", type=str, required=True, help="Path to original CSV")
     parser.add_argument("--denoised", type=str, required=True, help="Path to denoised CSV")
-    parser.add_argument("--output", type=str, default="TinyRecursiveModels/analysis/results",
+    parser.add_argument("--output", type=str, default="artifacts/analysis_results",
                         help="Output directory for results")
 
     args = parser.parse_args()

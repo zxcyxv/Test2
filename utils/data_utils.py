@@ -34,7 +34,7 @@ def purged_embargo_split(
         train_df, val_df: Split dataframes
 
     Example:
-        >>> df = pd.read_csv('train.csv')
+        >>> df = pd.read_csv('data/train.csv')
         >>> train, val = purged_embargo_split(df, train_ratio=0.8, embargo_days=5)
         >>> print(f"Train: {len(train)}, Val: {len(val)}")
     """
@@ -119,7 +119,7 @@ def load_and_split(
     Load CSV and split into train/val with optional saving.
 
     Args:
-        data_path: Path to input CSV (e.g., 'train.csv')
+        data_path: Path to input CSV (e.g., 'data/train.csv')
         train_ratio: Fraction for training (default 0.8)
         embargo_days: Buffer days between train/val (default 0)
         save_splits: Whether to save split files (default False)
@@ -129,7 +129,7 @@ def load_and_split(
         train_df, val_df: Split dataframes
 
     Example:
-        >>> train, val = load_and_split('train.csv', train_ratio=0.8, embargo_days=5)
+        >>> train, val = load_and_split('data/train.csv', train_ratio=0.8, embargo_days=5)
     """
     print(f"Loading data from {data_path}...")
     data = pd.read_csv(data_path)
@@ -156,7 +156,7 @@ if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--data_path", type=str, default="train.csv")
+    parser.add_argument("--data_path", type=str, default="data/train.csv")
     parser.add_argument("--train_ratio", type=float, default=0.8)
     parser.add_argument("--embargo_days", type=int, default=0)
     parser.add_argument("--save", action="store_true")

@@ -352,7 +352,7 @@ def compare_trading_performance(train_original_csv, train_denoised_csv, val_orig
     print(comparison_ret)
 
     # Save results
-    output_dir = Path("TinyRecursiveModels/evaluation_results")
+    output_dir = Path("artifacts/evaluation_results")
     output_dir.mkdir(parents=True, exist_ok=True)
 
     results_original.to_csv(output_dir / "original_trading_results.csv", index=False)

@@ -2,14 +2,14 @@
 Kaggle Notebook Training Script for CausalMamba Denoisers
 
 Usage in Kaggle:
-1. Upload FinancialDenoising folder (with train.csv) to Kaggle Dataset
+1. Upload FinancialDenoising folder (with data/train.csv) to Kaggle Dataset
 2. Create new GPU notebook (T4 or P100)
 3. Run this script
 
 Estimated time: 6-9 hours (T4 GPU)
 
 This script will:
-- Load train.csv
+- Load data/train.csv
 - Split into train/val (80/20, Purged Embargo Walk-Forward)
 - Train 7 CausalMamba models (one per feature cluster)
 - Save trained models to trained_models/
@@ -22,9 +22,9 @@ from pathlib import Path
 import time
 import argparse
 
-# Kaggle paths (auto-detected from script location)
-PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
-TRAIN_CSV_PATH = os.path.join(PROJECT_ROOT, "train.csv")
+# Paths are auto-detected from this script location.
+PROJECT_ROOT = str(Path(__file__).resolve().parents[1])
+TRAIN_CSV_PATH = os.path.join(PROJECT_ROOT, "data", "train.csv")
 
 # Training configuration
 CONFIG = {
@@ -51,7 +51,7 @@ def train_cluster(cluster_id: int, train_data_path: str, val_data_path: str = No
     start_time = time.time()
 
     # Auto-detect paths relative to PROJECT_ROOT
-    cluster_config_path = os.path.join(PROJECT_ROOT, "clustering_results", "cluster_assignments.json")
+    cluster_config_path = os.path.join(PROJECT_ROOT, "artifacts", "clustering_results", "cluster_assignments.json")
     output_dir = os.path.join(PROJECT_ROOT, "trained_models")
 
     cmd = [
@@ -142,7 +142,7 @@ def main():
 
     if not os.path.exists(TRAIN_CSV_PATH):
         print(f"\n[ERROR] Data file not found: {TRAIN_CSV_PATH}")
-        print("Please ensure train.csv is in the uploaded dataset!")
+        print("Please ensure data/train.csv is in the uploaded dataset!")
         return
 
     # Step 1: Load and split data
@@ -160,11 +160,11 @@ def main():
             train_ratio=CONFIG["train_ratio"],
             embargo_days=CONFIG["embargo_days"],
             save_splits=True,
-            output_dir=PROJECT_ROOT
+            output_dir=os.path.join(PROJECT_ROOT, "artifacts", "splits")
         )
 
-        train_data_path = f"{PROJECT_ROOT}/train_only.csv"
-        val_data_path = f"{PROJECT_ROOT}/val_only.csv"
+        train_data_path = os.path.join(PROJECT_ROOT, "artifacts", "splits", "train_only.csv")
+        val_data_path = os.path.join(PROJECT_ROOT, "artifacts", "splits", "val_only.csv")
 
         print(f"\n[OK] Data split completed")
         print(f"  Train: {train_data_path}")

@@ -31,11 +31,11 @@ print(f"  Input: {denoised_input}")
 print(f"  Output: {val_output}")
 
 # Load split metadata
-split_info_path = Path("TinyRecursiveModels/split_info.json")
+split_info_path = Path("artifacts/splits/split_info.json")
 if not split_info_path.exists():
     raise FileNotFoundError(
         f"Split metadata not found: {split_info_path}\n"
-        "Please run: python TinyRecursiveModels/train/split_train_val.py"
+        "Please run: python utils/split_train_val.py"
     )
 
 with open(split_info_path, 'r') as f:
@@ -45,12 +45,7 @@ n_train = split_info['n_train']
 n_val = split_info['n_val']
 print(f"Loaded split info: train={n_train}, val={n_val}")
 
-# Load denoised full dataset
-<<<<<<< HEAD
 df_denoised = pd.read_csv(denoised_input)
-=======
-df_denoised = pd.read_csv("train_denoised_v3.csv")
->>>>>>> b490f70 (Add trained denoiser models and leak-free datasets)
 print(f"Loaded denoised: {len(df_denoised)} rows")
 
 # Validate
@@ -63,11 +58,5 @@ df_denoised_val = df_denoised.iloc[n_train:].copy()
 
 print(f"Extracted val: {len(df_denoised_val)} rows")
 
-# Save
-<<<<<<< HEAD
 df_denoised_val.to_csv(val_output, index=False)
 print(f"Saved: {val_output}")
-=======
-df_denoised_val.to_csv("val_denoised_v3.csv", index=False)
-print("Saved: val_denoised.csv")
->>>>>>> b490f70 (Add trained denoiser models and leak-free datasets)

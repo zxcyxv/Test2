@@ -1,7 +1,7 @@
 """
 Feature Clustering Script
 
-Analyzes train.csv features and creates statistical clusters
+Analyzes data/train.csv features and creates statistical clusters
 for group-specific multivariate denoising.
 
 Usage:
@@ -72,13 +72,13 @@ def main():
     parser.add_argument(
         '--data_path',
         type=str,
-        default='TinyRecursiveModels/CSVs/train_only.csv',
+        default='data/train.csv',
         help='Path to training data CSV'
     )
     parser.add_argument(
         '--output_dir',
         type=str,
-        default='FinancialDenoising/clustering_results',
+        default='artifacts/clustering_results',
         help='Output directory for results'
     )
     parser.add_argument(

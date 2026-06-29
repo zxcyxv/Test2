@@ -37,20 +37,26 @@ ENV/
 .ipynb_checkpoints/
 *.ipynb
 
-# Model files (large)
-trained_models/*.pt
-trained_models/*.pth
-trained_models/*.ckpt
+# Model files (large, generated)
+trained_models/
+*.pt
+*.pth
+*.ckpt
 
 # Results (regenerable)
-clustering_results/*.png
-visualizations/
-evaluation_results/
+artifacts/analysis_results/
+artifacts/denoised/
+artifacts/evaluation_results/
+artifacts/splits/
+artifacts/visualizations/
 
 # Data
 *.csv
-!clustering_results/*.csv
-!train.csv
+!data/
+!data/train.csv
+!artifacts/
+!artifacts/clustering_results/
+!artifacts/clustering_results/*.csv
 
 # OS
 .DS_Store
@@ -59,11 +65,6 @@ Thumbs.db
 # Logs
 *.log
 logs/
-
-# UV package manager
-uv.lock
-.python-version
-src/
 
 # Claude Code settings (personal)
 .claude/

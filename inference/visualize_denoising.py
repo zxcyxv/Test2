@@ -5,7 +5,7 @@ Compares original vs denoised data with visualizations and statistics.
 
 Usage:
     python inference/visualize_denoising.py \
-        --original train.csv \
+        --original data/train.csv \
         --denoised train_denoised.csv \
         --output_dir visualizations
 """
@@ -133,8 +133,8 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--original", type=str, required=True)
     parser.add_argument("--denoised", type=str, required=True)
-    parser.add_argument("--cluster_config", type=str, default="FinancialDenoising/clustering_results/cluster_assignments.json")
-    parser.add_argument("--output_dir", type=str, default="FinancialDenoising/visualizations")
+    parser.add_argument("--cluster_config", type=str, default="artifacts/clustering_results/cluster_assignments.json")
+    parser.add_argument("--output_dir", type=str, default="artifacts/visualizations")
     parser.add_argument("--n_samples", type=int, default=3, help="Number of features to visualize per cluster")
 
     args = parser.parse_args()

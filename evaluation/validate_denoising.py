@@ -243,7 +243,7 @@ def compare_datasets(original_csv, denoised_csv, n_splits=5):
     print(comparison)
 
     # Save results
-    output_dir = Path("TinyRecursiveModels/evaluation_results")
+    output_dir = Path("artifacts/evaluation_results")
     output_dir.mkdir(parents=True, exist_ok=True)
 
     results_original.to_csv(output_dir / "original_cv_results.csv", index=False)

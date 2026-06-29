@@ -1,6 +1,6 @@
-# Common Utilities
+# common Utilities
 
-Shared evaluation and utility functions used across multiple modules (FinancialDenoising, TinyRecursiveModels).
+Shared evaluation and utility functions used across multiple modules (FinancialDenoising, this project).
 
 ## Overview
 
@@ -9,7 +9,7 @@ This directory contains common utilities that are used by both the denoising pip
 ## Directory Structure
 
 ```
-Common/
+common/
 └── evaluation/
     └── validate_trading_signals.py
 ```
@@ -21,11 +21,11 @@ Compares trading performance between original and denoised (or processed) datase
 ### Usage
 
 ```bash
-python Common/evaluation/validate_trading_signals.py \
-    --train_original TinyRecursiveModels/CSVs/train_only.csv \
-    --train_denoised TinyRecursiveModels/CSVs/train_denoised.csv \
-    --val_original TinyRecursiveModels/CSVs/val_only.csv \
-    --val_denoised TinyRecursiveModels/CSVs/val_denoised.csv
+python common/evaluation/validate_trading_signals.py \
+    --train_original data/train.csv \
+    --train_denoised artifacts/denoised/train_denoised.csv \
+    --val_original artifacts/splits/val_only.csv \
+    --val_denoised artifacts/denoised/val_denoised.csv
 ```
 
 ### Metrics
@@ -50,7 +50,7 @@ python Common/evaluation/validate_trading_signals.py \
 
 ### Output
 
-Saves comparison results to `TinyRecursiveModels/evaluation_results/`:
+Saves comparison results to `artifacts/evaluation_results/`:
 - `original_trading_results.csv`
 - `denoised_trading_results.csv`
 - `trading_adjusted_sharpe_comparison.csv`
@@ -62,20 +62,20 @@ Saves comparison results to `TinyRecursiveModels/evaluation_results/`:
 ### From FinancialDenoising
 
 ```bash
-python Common/evaluation/validate_trading_signals.py \
-    --train_original TinyRecursiveModels/CSVs/train_only.csv \
+python common/evaluation/validate_trading_signals.py \
+    --train_original data/train.csv \
     --train_denoised train_denoised_causal.csv \
-    --val_original TinyRecursiveModels/CSVs/val_only.csv \
+    --val_original artifacts/splits/val_only.csv \
     --val_denoised val_denoised_causal.csv
 ```
 
-### From TinyRecursiveModels
+### From this project
 
 ```bash
-python Common/evaluation/validate_trading_signals.py \
-    --train_original TinyRecursiveModels/CSVs/train_only.csv \
+python common/evaluation/validate_trading_signals.py \
+    --train_original data/train.csv \
     --train_denoised TRM_predictions_train.csv \
-    --val_original TinyRecursiveModels/CSVs/val_only.csv \
+    --val_original artifacts/splits/val_only.csv \
     --val_denoised TRM_predictions_val.csv
 ```
 

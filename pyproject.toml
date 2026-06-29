@@ -1,7 +1,7 @@
 [project]
 name = "financialdenoising"
 version = "0.1.0"
-description = "Add your description here"
+description = "Diffusion and Mamba based denoising pipeline for financial time series features"
 readme = "README.md"
 authors = [
     { name = "pierre", email = "jrjinwoo@gmail.com" }

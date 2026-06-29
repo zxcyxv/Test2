@@ -1,5 +1,5 @@
 """
-Split train.csv into train (80%) and val (20%) for proper evaluation.
+Split data/train.csv into train (80%) and val (20%) for proper evaluation.
 
 This ensures denoising model is trained only on train set,
 and evaluation is done only on unseen val set.
@@ -14,7 +14,7 @@ def split_train_val(input_csv: str, train_ratio: float = 0.8):
     Split dataset into train and val sets.
 
     Args:
-        input_csv: Path to train.csv
+        input_csv: Path to data/train.csv
         train_ratio: Ratio of training data (default: 0.8)
     """
     print("="*80)
@@ -55,10 +55,10 @@ def split_train_val(input_csv: str, train_ratio: float = 0.8):
     print("NEXT STEPS")
     print("="*80)
     print("\n1. Train denoising models on train_only.csv:")
-    print("   bash TinyRecursiveModels/train/train_all_clusters.sh")
+    print("   python scripts/kaggle_train_all_clusters.py")
     print("   (Modify script to use train_only.csv)")
     print("\n2. Denoise full dataset (train + val):")
-    print("   python inference/denoise_dataset.py --input_csv train.csv --output_csv train_denoised.csv")
+    print("   python inference/denoise_dataset.py --input_csv data/train.csv --output_csv train_denoised.csv")
     print("\n3. Extract denoised val set:")
     print("   Will create val_denoised.csv automatically")
     print("\n4. Evaluate on val set only:")
@@ -87,4 +87,4 @@ def split_train_val(input_csv: str, train_ratio: float = 0.8):
 
 
 if __name__ == "__main__":
-    split_train_val("TinyRecursiveModels/train.csv", train_ratio=0.8)
+    split_train_val("data/train.csv", train_ratio=0.8)
